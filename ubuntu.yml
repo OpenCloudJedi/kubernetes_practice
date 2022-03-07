@@ -1,0 +1,64 @@
+---
+- name: Configure ubuntu server
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Create user for lab activity
+      user:
+        name: ubuntu
+        state: present
+        password: "{{ 'Kube101!' | password_hash('sha512') }}"
+
+    - name: Install all the software needed
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - bash-completion
+        - vim
+        - git
+
+    - name: Enable ufw and allow port 22
+      ufw:
+        rule: allow
+        name: OpenSSH
+        state: enabled
+
+    - name: Add /etc/hosts file
+      template:
+        src: hosts.j2
+        dest: /etc/hosts
+    - name: Clone git repo for kube essentials
+      git:
+        repo: 'https://github.com/docker-training/kube-essentials.git'
+        dest: /home/vagrant/kube-essentials
+        clone: yes
+        update: yes
+      ignore_errors: true
+    - name: Recursively change ownership of a directory
+      file:
+        path: /home/vagrant/kube-essentials
+        state: directory
+        recurse: yes
+        owner: vagrant
+        group: vagrant
+    - name: Add execute privileges to scripts in kube-essentials
+      file:
+        path: "{{ item }}"
+        mode: a+x
+        owner: vagrant
+        group: vagrant
+      loop:
+        - /home/vagrant/kube-essentials/install-docker.sh
+        - /home/vagrant/kube-essentials/install-k8s-tools.sh
+
+        - /home/vagrant/kube-essentials/nfs-setup.sh
+    - name: Run install-docker.sh script
+      shell:
+        cmd: bash install-docker.sh
+        chdir: /home/vagrant/kube-essentials/
+    - name: Run install-k8s-tools.sh script
+      shell:
+        cmd: bash install-k8s-tools.sh
+        chdir: /home/vagrant/kube-essentials/
