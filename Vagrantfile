@@ -16,35 +16,13 @@ Vagrant.configure("2") do |config|
     v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
-  # master.
-  config.vm.define "master" do |master|
-    master.vm.box = "codeup/Ubuntu-20.04-GUI"
-    master.vm.hostname = "master.test"
-    master.vm.network :private_network, ip: "192.168.2.2"
-    master.vm.provision "shell",
-      inline: "sudo apt update -y"
-    master.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
-    master.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    master.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
-    master.vm.provider :virtualbox do |v|
-      v.customize ["modifyvm", :id, "--memory", 2048]
-      v.customize ["modifyvm", :id, "--cpus", 2]
-      v.customize ["modifyvm", :id, "--vram", 12]
-      v.customize ["modifyvm", :id, "--accelerate3d", "on"]
-    end
-  end
+ 
   # Server1.
   config.vm.define "node1" do |server1|
     server1.vm.box = "codeup/Ubuntu-20.04-GUI"
     server1.vm.hostname = "node1.test"
     server1.vm.network :private_network, ip: "192.168.2.3"
     server1.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
-    server1.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    server1.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
     server1.vm.provision "shell",
       inline: "sudo systemctl set-default multi-user.target"
     server1.vm.provision "shell",
@@ -67,11 +45,7 @@ Vagrant.configure("2") do |config|
     server2.vm.network :private_network, ip: "192.168.2.4"
     server2.vm.provision "shell",
       inline: "sudo apt update -y"
-     server2.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
-     server2.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    server2.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
+    server2.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
     server2.vm.provision "shell",
       inline: "sudo systemctl set-default multi-user.target"
     server2.vm.provision "shell",
@@ -90,11 +64,8 @@ Vagrant.configure("2") do |config|
     server3.vm.network :private_network, ip: "192.168.2.5"
     server3.vm.provision "shell",
       inline: "sudo apt update -y"
-     server3.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
-     server3.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    server3.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
+    server3.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
+     
     server3.vm.provision "shell",
       inline: "sudo systemctl set-default multi-user.target"
     server3.vm.provision "shell",
@@ -117,11 +88,7 @@ Vagrant.configure("2") do |config|
     server4.vm.network :private_network, ip: "192.168.2.6"
     server4.vm.provision "shell",
       inline: "sudo apt update -y"
-     server4.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
-     server4.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    server4.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
+    server4.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
     server4.vm.provision "shell",
       inline: "sudo systemctl set-default multi-user.target"
     server4.vm.provision "shell",
@@ -147,10 +114,6 @@ Vagrant.configure("2") do |config|
     server5.vm.provision "shell",
       inline: "sudo systemctl set-default multi-user.target"
     server5.vm.provision "shell",
-      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
-    server5.vm.provision "shell",
-      inline: "bash /vagrant/provision.sh"
-    server5.vm.provision "shell",
       inline: "sudo reboot now"
     server5.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 768]
@@ -161,6 +124,25 @@ Vagrant.configure("2") do |config|
         v.customize ['createhd', '--filename', disk4, '--variant', 'Fixed', '--size', 1024]
         v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', disk4] 
       end
+    end
+  end
+   # master.
+  config.vm.define "master" do |master|
+    master.vm.box = "codeup/Ubuntu-20.04-GUI"
+    master.vm.hostname = "master.test"
+    master.vm.network :private_network, ip: "192.168.2.2"
+    master.vm.provision "shell",
+      inline: "sudo apt update -y"
+    master.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/", "disk-0-1.vdi", "disk-0-2.vdi", "disk-0-3.vdi", "disk-0-4.vdi"]
+    master.vm.provision "shell",
+      inline: "sudo cp /vagrant/ansible.cfg /etc/ansible/ansible.cfg"
+    master.vm.provision "shell",
+      inline: "bash /vagrant/provision.sh"
+    master.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 2048]
+      v.customize ["modifyvm", :id, "--cpus", 2]
+      v.customize ["modifyvm", :id, "--vram", 12]
+      v.customize ["modifyvm", :id, "--accelerate3d", "on"]
     end
   end
 end
