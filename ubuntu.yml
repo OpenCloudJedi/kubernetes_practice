@@ -18,93 +18,22 @@
         - bash-completion
         - vim
         - git
-        - apt-transport-https
-        - ca-certificates
-        - gnupg-agent
-        - software-properties-common
         - curl
         - gnustep-gui-runtime
-
-    - name: Add Docker’s official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-    - name: Add Docker Repository
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
-        state: present
-        filename: docker
-        mode: 0600
-    - name: Install Docker Engine.
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: present
-    - name: add vagrant user to the docker group
-      user:
-        name: vagrant
-        groups: docker
-        append: yes
-    - name: Enable service docker, and enable persistently
-      service:
-        name: docker
-        enabled: yes
-    - name: Add Google official GPG key
-      apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        state: present
-    - name: Add Kubernetes Repository
-      apt_repository:
-        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-        state: present
-        filename: kubernetes
-        mode: 0600
-    - name: Installing Kubernetes Cluster Packages.
-      apt:
-        name:
-          - kubeadm
-          - kubectl
-          - kubelet
-        state: present
-    - name: Enable service kubelet, and enable persistently
-      service:
-        name: kubelet
-        enabled: yes
-
-    - name: Add /etc/hosts file
-      template:
-        src: hosts.j2
-        dest: /etc/hosts
-    - name: Clone git repo for kube essentials
-      git:
-        repo: 'https://github.com/docker-training/kube-essentials.git'
-        dest: /home/vagrant/kube-essentials
-        clone: yes
-        update: yes
-      ignore_errors: true
-    - name: Recursively change ownership of a directory
-      file:
-        path: /home/vagrant/kube-essentials
-        state: directory
-        recurse: yes
-        owner: vagrant
-        group: vagrant
-    - name: Add execute privileges to scripts in kube-essentials
-      file:
-        path: "{{ item }}"
-        mode: a+x
-        owner: vagrant
-        group: vagrant
+        - python3-virtualenv
+        - python3-pip
+    - name: Install other requirements using pip
+      pip:
+        name: "{{ item }}"
       loop:
-        - /home/vagrant/kube-essentials/install-docker.sh
-        - /home/vagrant/kube-essentials/install-k8s-tools.sh
-        - /home/vagrant/kube-essentials/nfs-setup.sh
-    - name: Reboot all the kubernetes nodes.
-      reboot:
-        post_reboot_delay: 10
-        reboot_timeout: 40
-        connect_timeout: 60
-        test_command: uptime
-      when: "'workers' in group_names"
+        - ansible==4.8.0
+        - ansible-core==2.11.6
+        - cryptography==2.8
+        - jinja2==2.11.3  
+        - netaddr==0.7.19
+        - pbr==5.4.4
+        - jmespath==0.9.5
+        - ruamel.yaml==0.16.10
+        - ruamel.yaml.clib==0.2.6
+        - MarkupSafe==1.1.1
+    
